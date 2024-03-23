@@ -33,6 +33,13 @@ describe("escrow", () => {
       inspector.address,
       lender.address
     );
+
+    // Approve Property
+    transaction = await realEstate.connect(seller).approve(escrow.address, 1);
+
+    // List property
+    transaction = await escrow.connect(seller).list(1);
+    await transaction.wait();
   });
 
   describe("Deployment", () => {
@@ -58,6 +65,14 @@ describe("escrow", () => {
       const result = await escrow.lender();
       console.log("lender Address", result);
       expect(result).to.be.equal(lender.address);
+    });
+  });
+
+  describe("Listing", () => {
+    it("Updates Ownership", async () => {
+      console.log("real estate owner ", await realEstate.ownerOf(1));
+      console.log("escrow owner ", escrow.address);
+      expect(await realEstate.ownerOf(1)).to.be.equal(escrow.address);
     });
   });
 });
