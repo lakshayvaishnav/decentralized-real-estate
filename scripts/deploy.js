@@ -4,15 +4,61 @@
 // You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
 // will compile your contracts, add the Hardhat Runtime Environment's members to the
 // global scope, and execute the script.
-const hre = require("hardhat");
+const hre = require('hardhat')
 
-async function main() {
-
+const token = (n) => {
+  return ethers.utils.parseEther(n.toString())
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
+async function main() {
+  const [buyer, seller, inspector, lender] = await ethers.getSigners()
+
+  // const deploy contracts.
+
+  // Deploy RealEstate
+  const RealEstate = await ethers.getContractFactory('RealEstate')
+  const realEstate = await RealEstate.deploy()
+  await realEstate.deployed()
+  console.log(`Deployed Real Estate Contract at: ${realEstate.address}`)
+  console.log(`Minting 3 properties...\n`)
+
+  for (let i = 0; i < 3; i++) {
+    const transaction = await realEstate
+      .connect(seller)
+      .mint(`https://ipfs.io/ipfs/QmQVcpsjrA6cr1iJjZAodYwmPekYgbnXGo4DFubJiLc2EB/${i + 1}.json`)
+    await transaction.wait()
+  }
+
+  // Deploy Escrow
+  const Escrow = await ethers.getContractFactory('Escrow')
+  const escrow = await Escrow.deploy(
+    realEstate.address,
+    seller.address,
+    inspector.address,
+    lender.address,
+  )
+  await escrow.deployed()
+
+  console.log(`Escrow contract deployed ate : ${escrow.address}`)
+  console.log('Listing 3 propertis \n ')
+
+  for (let i = 0; i < 3; i++) {
+    // Approve properties...
+    let transaction = await realEstate.connect(seller).approve(escrow.address, i + 1)
+    await transaction.wait()
+  }
+
+  // Listing Properties
+  transaction = await escrow.connect(seller).list(1, buyer.address, token(20), token(10))
+  await transaction.wait()
+  transaction = await escrow.connect(seller).list(2, buyer.address, token(15), token(5))
+  await transaction.wait()
+  transaction = await escrow.connect(seller).list(3, buyer.address, token(10), token(5))
+  await transaction.wait()
+
+  console.log('Finished')
+}
 main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  console.error(error)
+  process.exitCode = 1
+})
