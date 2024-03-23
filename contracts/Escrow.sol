@@ -75,4 +75,8 @@ contract Escrow {
     ) public onlyInspector {
         inspectorPassed[_nftID] = _passed;
     }
+
+    function approveSale(uint256 _nftID) public {
+        approval[_nftID][msg.sender] = true;
+    }
 }
