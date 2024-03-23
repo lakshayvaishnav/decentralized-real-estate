@@ -38,41 +38,57 @@ describe("escrow", () => {
     transaction = await realEstate.connect(seller).approve(escrow.address, 1);
 
     // List property
-    transaction = await escrow.connect(seller).list(1);
+    transaction = await escrow
+      .connect(seller)
+      .list(1, buyer.address, token(10), token(5));
     await transaction.wait();
   });
 
   describe("Deployment", () => {
     it("returns the nft Address", async () => {
       const result = await escrow.nftAddress();
-      console.log("nft Address", result);
       expect(result).to.be.equal(realEstate.address);
     });
 
     it("returns the seller address", async () => {
       const result = await escrow.seller();
-      console.log("seller Address", result);
       expect(result).to.be.equal(seller.address);
     });
 
     it("returns the inspector address", async () => {
       const result = await escrow.inspector();
-      console.log("inspector Address", result);
       expect(result).to.be.equal(inspector.address);
     });
 
     it("returns the lender address", async () => {
       const result = await escrow.lender();
-      console.log("lender Address", result);
       expect(result).to.be.equal(lender.address);
     });
   });
 
   describe("Listing", () => {
     it("Updates Ownership", async () => {
-      console.log("real estate owner ", await realEstate.ownerOf(1));
-      console.log("escrow owner ", escrow.address);
       expect(await realEstate.ownerOf(1)).to.be.equal(escrow.address);
+    });
+
+    it("Updates is Listed", async () => {
+      const result = await escrow.isListed(1);
+      expect(result).to.be.equal(true);
+    });
+
+    it("Returns the Buyer", async () => {
+      const result = await escrow.buyer(1);
+      expect(result).to.be.equal(buyer.address);
+    });
+
+    it("Returns Purchase Price", async () => {
+      const result = await escrow.purchasePrice(1);
+      expect(result).to.be.equal(token(10));
+    });
+
+    it("Returns the Escrow Amount", async () => {
+      const result = await escrow.escrowAmount(1);
+      expect(result).to.be.equal(token(5));
     });
   });
 });
