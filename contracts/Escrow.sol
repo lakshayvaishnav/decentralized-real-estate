@@ -68,4 +68,11 @@ contract Escrow {
     function getBalance() public view returns (uint256) {
         return address(this).balance;
     }
+
+    function updateInspectionStatus(
+        uint256 _nftID,
+        bool _passed
+    ) public onlyInspector {
+        inspectorPassed[_nftID] = _passed;
+    }
 }
