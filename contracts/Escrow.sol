@@ -59,4 +59,13 @@ contract Escrow {
         escrowAmount[_nftID] = _escrowAmount;
         buyer[_nftID] = _buyer;
     }
+
+    // Put under contract (only Buyer can do this) => this is more like a downPayment
+    function depositErnest(uint256 _nftID) public payable onlyBuyer(_nftID) {
+        require(msg.value >= escrowAmount[_nftID]);
+    }
+
+    function getBalance() public view returns (uint256) {
+        return address(this).balance;
+    }
 }

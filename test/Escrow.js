@@ -91,4 +91,15 @@ describe("escrow", () => {
       expect(result).to.be.equal(token(5));
     });
   });
+
+  describe("Deposits", () => {
+    it("Updates the contract Balance", async () => {
+      const transaction = await escrow
+        .connect(buyer)
+        .depositErnest(1, { value: token(5) });
+      await transaction.wait();
+      const result = await escrow.getBalance();
+      expect(result).to.be.equal(token(5));
+    });
+  });
 });
