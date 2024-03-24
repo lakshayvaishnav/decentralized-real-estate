@@ -25,10 +25,14 @@ function App() {
       setAccount(account)
     })
   }
+  useEffect(() => {
+    loadBloackchainData()
+  }, [])
 
   return (
     <div>
       <Navigation account={account} setAccount={setAccount} />
+      <Search/>
       <div className='cards__section'>
         <h3>Welcome to Millow ! I EDITIED</h3>
       </div>
